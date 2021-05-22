@@ -50,7 +50,7 @@ excerpt_separator: <!-- more -->
 # 你的社交网络链接，它们会作为图标出现在你的网站页脚中，可选填写
 footer-links: 
   email: 820546971@qq.com
-  github: https://github.com/zrd113
+  github: zrd113
 
 # 站点页脚的文字
 footer-text: Copyright (c) 2019 来自中世界
