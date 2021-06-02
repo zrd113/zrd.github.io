@@ -1,13 +1,13 @@
 ---
 layout: post
 title: redis-链表
-date: 2021-06-01
+date: 2021-06-02
 Author: zrd
 tags: [redis]
 toc: true
 ---
 
-## 一、 链表定义
+## 一、 链表的定义
 
 在redis中，列表的底层实现之一就是链表，它是一种双向无环链表，发布订阅、慢查询、监视器等功能都用到了链表。
 ```
