@@ -59,3 +59,36 @@ typedef struct list{
 ### 5. 多态
 
 链表节点通过void指针保存值，使其可以保存不同类型的值。
+
+## 三、 使用场景
+
+### 1. 带有阻塞功能的消息队列
+
+在项目中，经常会遇到很多耗时的操作，比如将一条微博同步给上百万个用户，如果直接在响应用户的请求过程中执行会等待很长时间，所以我们可以先将某个任务放在队列中，然后由后台线程负责执行，这样只需要一个入队操作就可以向用户返回结果了。在Redis中可以通过RPUSH将消息推入队列，然后通过BLPOP来阻塞获取消息。
+
+```
+public class BlockMessageQueue {
+    private String key;
+    private Jedis jedis;
+    public BlockMessageQueue(String key) {
+        this.key = key;
+        jedis = new Jedis("**.**.**.**", 6379);
+        jedis.auth("**");
+    }
+    public Long addMessage(String ...message) {
+        return jedis.rpush(key, message);
+    }
+    public String getMessage(int timeout) {
+        //如果队列没有数据，会阻塞timeout秒，如果timeout为0则会一直阻塞
+        List<String> result = jedis.blpop(timeout, key);
+        //result包括两个值，第一个是弹出队列，第二个是弹出值
+        if (result != null) {
+            return result.get(1);
+        }
+        return null;
+    }  
+    public Long len() {
+        return jedis.llen(key);
+    }
+}
+```
