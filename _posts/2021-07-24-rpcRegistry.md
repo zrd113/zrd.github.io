@@ -82,7 +82,8 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
         if (serviceUrlList == null || serviceUrlList.size() == 0) {
             log.error("没有注册该服务[{}]", rpcServiceName);
         }
-        String[] addrArray = serviceUrlList.get(0).split(":");
+        String targetAddress = loadBalance.selectServiceAddress(serviceUrlList, request);
+        String[] addrArray = targetAddress.split(":");
         String host = addrArray[0];
         int port = Integer.parseInt(addrArray[1]);
         return new InetSocketAddress(host, port);
@@ -91,4 +92,19 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
 ```
 
 我们可以根据请求对象中的全限定类名来查询对应的服务地址，地址可能不止一个，所以我们需要通过对应的负载均衡策略来选择出一个服务地址。
+
+## 负载均衡算法
+
+负载均衡包括很多算法，这里主要讲一致性哈希算法。
+
+### 普通哈希
+
+假设有三台缓存服务器s0、s1、s2，对缓存下的键进行hash计算，哈希后的值是个整数，再用缓存服务器的数量对这个值进行取模计算，余数决定数据应该缓存到哪台服务器上。hash(名称) % 机器数 = 余数。缺陷是当服务器数量发生变化时，会导致不能正常访问缓存数据。
+
+### 一致性哈希
+
+普通哈希会出问题本质上是因为除余的数是一个变化的值，如果除以一个很大的数，影响的数据就会有限，一致性哈希将整个哈希值空间组织成一个虚拟的圆环，如假设某哈希函数H的值空间为0-2^32-1。接下来定位数据时主要分为两步，第一步 将各个服务器使用Hash进行一个哈希，具体可以选择服务器的ip或主机名作为关键字进行哈希，这样每台机器就能确定其在哈希环上的位置。第二步将数据key使用相同的函数Hash计算出哈希值，并确定此数据在环上的位置，从此位置沿环顺时针“行走”，第一台遇到的服务器就是其应该定位到的服务器。
+
+
+
 

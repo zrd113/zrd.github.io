@@ -7,9 +7,24 @@ tags: [redis]
 toc: true
 ---
 
+字典是哈希键的底层实现之一，当一个哈希键包含的键值对比较多，又或者键值对中的元素都是比较长的字符串时，Redis就会使用字典作为哈希键的底层实现。
+
 ## 一、 字典的定义
 
 ```
+//字典结构
+typedef struct dict{
+         //特定类型函数，每个dictType保存了一组用于操作特定类型键值对的函数，redis会为用途不同的字典设
+         //置不同类型的特定函数
+         dictType *type;
+         //保存了需要传给特定类型函数的可选参数
+         void *privdata;
+         //哈希表数组，保存了两个哈希表，一个用来存储数据，一个用来rehash
+         dictht ht[2];
+         //rehash索引 当rehash不在进行时 值为-1
+         int trehashidx; 
+}dict;
+
 //哈希表结构
 typedef struct dictht{
          //哈希表数组，每个元素保存一个dictEntry结构，dictEntry保存着一个键值对
@@ -35,19 +50,6 @@ typedef struct dictEntry{
          // 指向下个哈希表节点，形成链表来解决冲突问题
          struct dictEntry *next;
 }dictEntry;
-
-//字典结构
-typedef struct dict{
-         //特定类型函数，每个dictType保存了一组用于操作特定类型键值对的函数，redis会为用途不同的字典设
-         //置不同类型的特定函数
-         dictType *type;
-         //保存了需要传给特定类型函数的可选参数
-         void *privdata;
-         //哈希表数组，保存了两个哈希表，一个用来存储数据，一个用来rehash
-         dictht ht[2];
-         //rehash索引 当rehash不在进行时 值为-1
-         int trehashidx; 
-}dict;
 
 //特定类型函数
 typedef struct dictType{

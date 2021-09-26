@@ -11,16 +11,6 @@ toc: true
 
 在redis中，列表的底层实现之一就是链表，它是一种双向无环链表，发布订阅、慢查询、监视器等功能都用到了链表。
 ```
-//链表节点结构
-typedef struct listNode{ 
-	// 前置节点 
-	struct listNode *prev; 
-	// 后置节点 
-	struct listNode *next; 
-	// 节点的值 
-	void *value; 
-} listNode;
-
 //链表结构
 typedef struct list{
     //表头节点
@@ -36,6 +26,16 @@ typedef struct list{
     //节点值对比函数
     int (*match)(void *ptr,void *key);
 }list;
+
+//链表节点结构
+typedef struct listNode{ 
+	// 前置节点 
+	struct listNode *prev; 
+	// 后置节点 
+	struct listNode *next; 
+	// 节点的值 
+	void *value; 
+} listNode;
 ```
 
 ## 二、 链表特点
